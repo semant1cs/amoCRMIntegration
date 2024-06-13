@@ -9,35 +9,32 @@ export class AppService {
       .get('https://llongpoblwc.amocrm.ru/api/v4/leads')
       .then(async (response) => {
         const leads = response.data._embedded.leads;
+        let filteredLeads = [];
+        let normalizedLeads = [];
 
-        // TODO: доделать работу со сделками, чтобы подсоединялись все принадлежащие сущности!
-        const filteredLeads = await this.getResponsibles(leads);
+        await Promise.all(
+          leads.map((lead) => axiosInstanse(`https://llongpoblwc.amocrm.ru/api/v4/users/${lead.responsible_user_id}`))
+        ).then((results) => {
+          filteredLeads = results.map((res) => res.data.name);
+        });
 
-        return leads;
+        normalizedLeads = this.normalizeLeads(leads, filteredLeads);
+
+        return normalizedLeads;
       })
       .catch((e) => console.log(e));
   }
 
-  async getResponsibles(leads) {
-    const newLeads = await leads.map(async (lead) => {
-      const responsibleUserName = await this.getUser(lead.responsible_user_id);
-
+  normalizeLeads(leads, filteredLeads) {
+    return leads.map((lead, index) => {
       return {
         key: lead.id,
         name: lead.name,
         budget: lead.price,
         status: lead.status_id,
-        responsible: responsibleUserName,
+        responsible: filteredLeads[index],
         date: lead.created_at,
       };
     });
-
-    return newLeads;
-  }
-
-  async getUser(responsibleUserId) {
-    return await axiosInstanse
-      .get(`https://llongpoblwc.amocrm.ru/api/v4/users/${responsibleUserId}`)
-      .then((response) => response.data.name);
   }
 }

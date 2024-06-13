@@ -5,7 +5,7 @@ type contractTypeLead = {
   id: string;
   name: string;
   price: number;
-  status_id: string;
+  status: string;
   responsible_user_id: string;
   created_at: string;
 };
@@ -20,18 +20,8 @@ export default {
   methods: {
     async formTable() {
       this.columns = getColumns();
-      const fetchedData = await getData();
 
-      this.data = fetchedData.map((fetchedPart: contractTypeLead) => {
-        return {
-          key: fetchedPart.id,
-          name: fetchedPart.name,
-          budget: fetchedPart.price,
-          status: fetchedPart.status_id.toString(),
-          responsible: fetchedPart.responsible_user_id,
-          date: fetchedPart.created_at,
-        };
-      });
+      this.data = await getData();
     },
     removeRecord(record: DataType) {
       this.data = this.data.filter((dataRecord: DataType) => dataRecord.key !== record.key);
@@ -62,7 +52,7 @@ export default {
       <template v-else-if="column.key === 'status'">
         <span>
           <a-tag color="geekblue">
-            {{ record.status.toUpperCase() }}
+            {{ record.status.toString().toUpperCase() }}
           </a-tag>
         </span>
       </template>
