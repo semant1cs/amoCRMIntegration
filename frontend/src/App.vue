@@ -2,7 +2,7 @@
 import { getData, getColumns, DataType, ColumnType } from "./api";
 
 type contractTypeLead = {
-  id: string;
+  key: string;
   name: string;
   price: number;
   status: string;
@@ -12,7 +12,7 @@ type contractTypeLead = {
 
 export default {
   data() {
-    return { columns: [] as ColumnType[], data: [] as DataType[] };
+    return { columns: [] as ColumnType[], data: [] as contractTypeLead[] };
   },
   beforeMount() {
     this.formTable();
@@ -24,7 +24,7 @@ export default {
       this.data = await getData();
     },
     removeRecord(record: DataType) {
-      this.data = this.data.filter((dataRecord: DataType) => dataRecord.key !== record.key);
+      this.data = this.data.filter((dataRecord: contractTypeLead) => dataRecord.key !== record.key);
     },
   },
 };
